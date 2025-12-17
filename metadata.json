@@ -1,0 +1,5 @@
+{
+  "name": "Ofacc+ Invoice Generator",
+  "description": "A dynamic invoice generation dashboard tab that calculates taxes in real-time and submits data to an n8n webhook.",
+  "requestFramePermissions": []
+}
