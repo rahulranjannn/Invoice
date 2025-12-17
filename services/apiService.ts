@@ -1,8 +1,16 @@
 import { InvoicePayload } from '../types';
+import { validateInvoicePayload } from '../utils/validation';
 
-const N8N_WEBHOOK_URL = 'https://rahulranjannn333.app.n8n.cloud/webhook/cc61665d-1b02-436b-8ca1-c558e811539e';
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://rahulranjannn333.app.n8n.cloud/webhook/cc61665d-1b02-436b-8ca1-c558e811539e';
 
 export const submitInvoice = async (payload: InvoicePayload): Promise<void> => {
+  // 1. Validation
+  const validationError = validateInvoicePayload(payload);
+  if (validationError) {
+    throw new Error(`Validation Error: ${validationError}`);
+  }
+
+  // 2. Submit
   try {
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
@@ -13,11 +21,10 @@ export const submitInvoice = async (payload: InvoicePayload): Promise<void> => {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      throw new Error(`API Error: ${response.statusText} (${response.status})`);
     }
-    
-    // Some n8n webhooks might return 200 with text, so we don't strictly parse JSON unless expected
-    return; 
+
+    return;
   } catch (error) {
     console.error('Failed to submit invoice:', error);
     throw error;

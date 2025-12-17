@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .tax-invoice-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Sub-Header / Details Grid */
+        .details-grid {
+            display: flex;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .box-left,
+        .box-right {
+            width: 50%;
+            padding: 10px;
+            border: 1px solid #eee;
+        }
+
+        .box-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-decoration: underline;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 2px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            width: 120px;
+        }
+
+        /* Bill To / Ship To */
+        .address-section {
+            display: flex;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .address-box {
+            width: 50%;
+            padding: 10px;
+            border-right: 1px solid #ddd;
+        }
+
+        .address-box:last-child {
+            border-right: none;
+        }
+
+        /* Main Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .striped tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Footer */
+        .footer-section {
+            margin-top: 20px;
+            border-top: 2px solid #333;
+            padding-top: 10px;
+        }
+
+        .amount-words {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .tax-analysis-table th {
+            font-size: 10px;
+            background-color: #eee;
+        }
+
+        .tax-analysis-table td {
+            font-size: 11px;
+        }
+
+        .bank-signatory {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .bank-details p {
+            margin: 2px 0;
+        }
+
+        .signatory-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 80px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">{{supplier_name}}</div>
+            <div class="tax-invoice-title">Tax Invoice</div>
+        </div>
+
+        <!-- Supplier & Invoice Details -->
+        <div class="details-grid">
+            <div class="box-left">
+                <div class="box-title">Sold By:</div>
+                <div style="font-weight:bold;">{{supplier_name}}</div>
+                <div>{{supplier_address}}</div>
+                <div class="info-row"><span class="info-label">GSTIN:</span> {{supplier_gstin}}</div>
+                <div class="info-row"><span class="info-label">State:</span> {{supplier_state_code}}</div>
+            </div>
+            <div class="box-right">
+                <div class="info-row"><span class="info-label">Invoice No:</span> <b>{{invoice_no}}</b></div>
+                <div class="info-row"><span class="info-label">Date:</span> {{invoice_date}}</div>
+                <div class="info-row"><span class="info-label">PO Ref:</span> {{po_ref_no}}</div>
+            </div>
+        </div>
+
+        <!-- Bill To / Ship To -->
+        <div class="address-section">
+            <div class="address-box">
+                <div class="box-title">Bill To (Buyer):</div>
+                <div style="font-weight:bold;">{{buyer_name}}</div>
+                <div>{{buyer_address}}</div>
+                <div class="info-row"><span class="info-label">GSTIN:</span> {{buyer_gstin}}</div>
+            </div>
+            <div class="address-box">
+                <div class="box-title">Ship To (Consignee):</div>
+                <div style="font-weight:bold;">{{buyer_name}}</div>
+                <div>{{buyer_address}}</div>
+            </div>
+        </div>
+
+        <!-- Main Items Table -->
+        <table class="striped">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 40px;">Sl.</th>
+                    <th>Description of Goods</th>
+                    <th class="text-center">HSN/SAC</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-center">Unit</th>
+                    <th class="text-right">Rate</th>
+                    <th class="text-right">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in line_items %}
+                <tr>
+                    <td class="text-center">{{ item.serial_no }}</td>
+                    <td>{{ item.description }}</td>
+                    <td class="text-center">{{ item.hsn_code }}</td>
+                    <td class="text-right">{{ item.quantity }}</td>
+                    <td class="text-center">{{ item.unit }}</td>
+                    <td class="text-right">{{ item.rate_per_unit }}</td>
+                    <td class="text-right">{{ item.amount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="text-right" style="font-weight:bold;">Taxable Total</td>
+                    <td class="text-right">{{taxable_total}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="text-right">CGST</td>
+                    <td class="text-right">{{cgst_amount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="text-right">SGST/IGST</td>
+                    <td class="text-right">{{sgst_igst_amount}}</td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="text-right" style="font-weight:bold; font-size:16px;">Grand Total</td>
+                    <td class="text-right" style="font-weight:bold; font-size:16px;">{{grand_total}}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Amount In Words -->
+        <div class="footer-section">
+            <div>Amount Chargeable (in words):</div>
+            <div class="amount-words" style="font-weight:bold;">{{amount_in_words}}</div>
+        </div>
+
+        <!-- Tax Analysis (Simplified for template) -->
+        <div style="margin-top: 10px;">
+            <div style="font-weight:bold; margin-bottom:5px; font-size:12px;">Tax Analysis:</div>
+            <table class="tax-analysis-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">HSN/SAC</th>
+                        <th rowspan="2" class="text-right">Taxable Value</th>
+                        <th colspan="2" class="text-center">Central Tax</th>
+                        <th colspan="2" class="text-center">State/UT Tax</th>
+                        <th rowspan="2" class="text-right">Total Tax</th>
+                    </tr>
+                    <tr>
+                        <th class="text-right">Rate</th>
+                        <th class="text-right">Amount</th>
+                        <th class="text-right">Rate</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total</td>
+                        <td class="text-right">{{taxable_total}}</td>
+                        <td class="text-right">{{cgst_rate}}%</td>
+                        <td class="text-right">{{cgst_amount}}</td>
+                        <td class="text-right">{{sgst_rate}}%</td>
+                        <td class="text-right">{{sgst_igst_amount}}</td>
+                        <td class="text-right">{{total_tax_amount}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Bank & Signatory -->
+        <div class="bank-signatory">
+            <div class="bank-details">
+                <div class="box-title">Bank Details</div>
+                <p>Bank Name: <b>HDFC Bank</b> (Example)</p>
+                <p>A/c No: <b>502000XXXXXX</b></p>
+                <p>IFSC Code: <b>HDFC0000XXX</b></p>
+            </div>
+            <div class="signatory-box">
+                <p style="font-weight:bold;">For {{supplier_name}}</p>
+                <div style="height: 40px;"></div>
+                <p>Authorised Signatory</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
